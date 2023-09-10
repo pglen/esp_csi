@@ -22,6 +22,7 @@
 
 #define CONFIG_LESS_INTERFERENCE_CHANNEL    11
 #define CONFIG_SEND_FREQUENCY               100
+//#define CONFIG_SEND_FREQUENCY               10
 
 static const uint8_t CONFIG_CSI_SEND_MAC[] = {0x1a, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const char *TAG = "csi_send";
@@ -73,8 +74,8 @@ void app_main()
 
     esp_now_peer_info_t peer = {
         .channel   = CONFIG_LESS_INTERFERENCE_CHANNEL,
-        .ifidx     = WIFI_IF_STA,    
-        .encrypt   = false,   
+        .ifidx     = WIFI_IF_STA,
+        .encrypt   = false,
         .peer_addr = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
     };
     ESP_ERROR_CHECK(esp_now_add_peer(&peer));
@@ -89,7 +90,7 @@ void app_main()
         if(ret != ESP_OK) {
             ESP_LOGW(TAG, "<%s> ESP-NOW send error", esp_err_to_name(ret));
         }
-
+        //ESP_LOGI(TAG, "%d ",   count);
         usleep(1000 * 1000 / CONFIG_SEND_FREQUENCY);
     }
 }

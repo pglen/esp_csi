@@ -21,6 +21,7 @@
 
 #define CONFIG_LESS_INTERFERENCE_CHANNEL    11
 #define CONFIG_SEND_FREQUENCY               100
+//#define CONFIG_SEND_FREQUENCY               1
 
 static const uint8_t CONFIG_CSI_SEND_MAC[] = {0x1a, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const char *TAG = "csi_recv";
@@ -57,12 +58,18 @@ static void wifi_csi_rx_cb(void *ctx, wifi_csi_info_t *info)
     }
 
     static int s_count = 0;
+    //static int p_count = 0;
+
     const wifi_pkt_rx_ctrl_t *rx_ctrl = &info->rx_ctrl;
 
     if (!s_count) {
         ESP_LOGI(TAG, "================ CSI RECV ================");
         ets_printf("type,id,mac,rssi,rate,sig_mode,mcs,bandwidth,smoothing,not_sounding,aggregation,stbc,fec_coding,sgi,noise_floor,ampdu_cnt,channel,secondary_channel,local_timestamp,ant,sig_len,rx_state,len,first_word,data\n");
     }
+
+    //p_count++;
+    //if (p_count % 100)
+    //    return;
 
     ets_printf("CSI_DATA,%d," MACSTR ",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
             s_count++, MAC2STR(info->mac), rx_ctrl->rssi, rx_ctrl->rate, rx_ctrl->sig_mode,
@@ -77,7 +84,7 @@ static void wifi_csi_rx_cb(void *ctx, wifi_csi_info_t *info)
         ets_printf(",%d", info->buf[i]);
     }
 
-    ets_printf("]\"\n");
+    ets_printf("]\"\n\n");
 }
 
 static void wifi_csi_init()
