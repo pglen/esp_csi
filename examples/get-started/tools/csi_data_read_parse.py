@@ -59,8 +59,11 @@ csi_vaid_subcarrier_index += [i for i in range(6, MAX_SHADES +6, CSI_VAID_SUBCAR
 csi_vaid_subcarrier_color += [(i * color_step +70, 0, 0) for i in range(0,  MAX_SHADES // CSI_VAID_SUBCARRIER_INTERVAL + 1) ]
 csi_vaid_subcarrier_index += [i for i in range(MAX_SHADES +6, MAX_SHADES +MAX_SHADES +6, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
 csi_vaid_subcarrier_color += [(0, i * color_step +70, 0) for i in range(0,  MAX_SHADES // CSI_VAID_SUBCARRIER_INTERVAL + 1) ]
-csi_vaid_subcarrier_index += [i for i in range(MAX_SHADES +MAX_SHADES +6, MAX_SHADES +MAX_SHADES +MAX_SHADES +6, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+csi_vaid_subcarrier_index += [i for i in range(2*MAX_SHADES +6, 3*MAX_SHADES +6, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
 csi_vaid_subcarrier_color += [(0, 0, i * color_step +70) for i in range(0,  MAX_SHADES // CSI_VAID_SUBCARRIER_INTERVAL + 1) ]
+
+#csi_vaid_subcarrier_index += [i for i in range(3*MAX_SHADES +6, 4*MAX_SHADES +6, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+#csi_vaid_subcarrier_color += [(128, 128, i * color_step +70) for i in range(0,  MAX_SHADES // CSI_VAID_SUBCARRIER_INTERVAL + 1) ]
 
 #csi_vaid_subcarrier_index += [i for i in range(33, 59, CSI_VAID_SUBCARRIER_INTERVAL)]    # 26  green
 #csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  26 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
@@ -127,18 +130,18 @@ class csi_data_graphical_window(QMainWindow):
         self.main = QWidget(self)
         self.main_layout = QVBoxLayout(self.main)
         self.main_layout.addWidget(self.plotWidget_ted)
-        self.main_layout.addWidget(self.plotWidget_ted2)
+        #self.main_layout.addWidget(self.plotWidget_ted2)
         #self.setLayout(self.main_layout)
         self.setCentralWidget(self.main)
 
-        self.csi_phase_array = csi_data_array
+        #self.csi_phase_array = csi_data_array
         self.curve_list = []
 
         #print(f"csi_vaid_subcarrier_color, len: {len(csi_vaid_subcarrier_color)}, {csi_vaid_subcarrier_color}")
 
         for i in range(CSI_DATA_COLUMNS):
             curve = self.plotWidget_ted.plot(
-                self.csi_phase_array[:, i],
+                csi_data_array[:, i],
                         name=str(i) + ' ' + str(i*CSI_VAID_SUBCARRIER_INTERVAL),
                     pen=csi_vaid_subcarrier_color[i])
             self.curve_list.append(curve)
@@ -146,33 +149,33 @@ class csi_data_graphical_window(QMainWindow):
         self.csi_phase_array2 = csi_data_array2
         self.curve_list2 = []
 
-        for i in range(CSI_DATA_COLUMNS):
-            curve = self.plotWidget_ted2.plot(
-                self.csi_phase_array2[:, i],
-                        name=str(i) + ' ' + str(i*CSI_VAID_SUBCARRIER_INTERVAL),
-                    pen=csi_vaid_subcarrier_color[i])
-            self.curve_list2.append(curve)
+        #for i in range(CSI_DATA_COLUMNS):
+        #    curve = self.plotWidget_ted2.plot(
+        #        self.csi_phase_array2[:, i],
+        #                name=str(i) + ' ' + str(i*CSI_VAID_SUBCARRIER_INTERVAL),
+        #            pen=csi_vaid_subcarrier_color[i])
+        #    self.curve_list2.append(curve)
 
         self.timer = pq.QtCore.QTimer()
         self.timer.timeout.connect(self.update_data)
         self.timer.start(100)
 
-        self.timer2 = pq.QtCore.QTimer()
-        self.timer2.timeout.connect(self.update_data2)
-        self.timer2.start(100)
+        #self.timer2 = pq.QtCore.QTimer()
+        #self.timer2.timeout.connect(self.update_data2)
+        #self.timer2.start(100)
 
     def update_data(self):
         #print(csi_data_array.shape)
 
         #self.csi_phase_array = np.abs(csi_data_array)
-        self.csi_phase_array = csi_data_array
+        #self.csi_phase_array = csi_data_array
         #self.csi_phase_array[-1] = np.array([np.real(csi_data_array[-1]),
         #         np.imag(csi_data_array[-1])])
         #self.csi_phase_array[1] = np.copy(csi_data_array[1])
         #print(self.csi_phase_array)
 
         for i in range(CSI_DATA_COLUMNS):
-            self.curve_list[i].setData(self.csi_phase_array[:, i])
+            self.curve_list[i].setData(csi_data_array[:, i])
 
         if stopme:
             #print("stopme")
@@ -181,27 +184,7 @@ class csi_data_graphical_window(QMainWindow):
             sys.exit()
             #return True
 
-    def update_data2(self):
-        #print(csi_data_array.shape)
-
-        #self.csi_phase_array = np.abs(csi_data_array)
-        self.csi_phase_array = csi_data_array2
-        #self.csi_phase_array[-1] = np.array([np.real(csi_data_array[-1]),
-        #         np.imag(csi_data_array[-1])])
-        #self.csi_phase_array[1] = np.copy(csi_data_array[1])
-        #print(self.csi_phase_array)
-
-        for i in range(CSI_DATA_COLUMNS):
-            self.curve_list2[i].setData(self.csi_phase_array[:, i])
-
-        if stopme:
-            #print("stopme")
-            subthread2 = []
-
-            sys.exit()
-            #return True
-
-def csi_data_read_parse(port: str, csv_writer):
+def csi_data_read_parse(port: str, csv_writer, outdata):
 
     ser = None
     try:
@@ -215,7 +198,8 @@ def csi_data_read_parse(port: str, csv_writer):
         #sys.exit()
 
     if ser.isOpen():
-        print("open success", port)
+        #=print("open success", port)
+        pass
     else:
         print("open failed")
         return
@@ -251,7 +235,8 @@ def csi_data_read_parse(port: str, csv_writer):
         csv_writer.writerow(csi_data)
 
         # Rotate data to the left
-        csi_data_array[:-1] = csi_data_array[1:]
+        #csi_data_array[:-1] = csi_data_array[1:]
+        outdata[:-1] = outdata[1:]
 
         if len(csi_raw_data) == 128:
             csi_vaid_subcarrier_len = CSI_DATA_LLFT_COLUMNS
@@ -263,89 +248,7 @@ def csi_data_read_parse(port: str, csv_writer):
             #                                csi_raw_data[csi_vaid_subcarrier_index[i] * 2 - 1])
 
             # simpler data representation
-            csi_data_array[-1][i] = csi_raw_data[csi_vaid_subcarrier_index[i] * 2]
-            #csi_data_array[-1][i] = csi_raw_data[csi_vaid_subcarrier_index[i] * 2 - 1]
-
-            #try:
-            #    csi_data_array[-1][i] = \
-            #        csi_raw_data[csi_vaid_subcarrier_index[i] * 2] / \
-            #            csi_raw_data[csi_vaid_subcarrier_index[i] * 2  - 1]
-            #except:
-            #    pass
-            #    csi_data_array[-1][i] = 0
-
-            #csi_data_array[-1][i] = complex(0,
-            #                                csi_raw_data[csi_vaid_subcarrier_index[i] * 2 - 1])
-            #csi_data_array[-1][i] = complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2],
-            #                                0)
-
-    ser.close()
-    return
-
-
-def csi_data_read_parse2(port: str, csv_writer):
-
-    ser = None
-    try:
-        ser = serial.Serial(port=port, baudrate=921600,
-                        bytesize=8, parity='N', stopbits=1)
-    except:
-        print("open", sys.exc_info())
-        global stopme
-        stopme = 1
-        return
-        #sys.exit()
-
-    if ser.isOpen():
-        print("open success")
-    else:
-        print("open failed")
-        return
-
-    while True:
-        strings = str(ser.readline())
-        if not strings:
-            break
-
-        strings = strings.lstrip('b\'').rstrip('\\r\\n\'')
-        index = strings.find('CSI_DATA')
-
-        if index == -1:
-            continue
-
-        csv_reader = csv.reader(StringIO(strings))
-        csi_data = next(csv_reader)
-
-        if len(csi_data) != len(DATA_COLUMNS_NAMES):
-            print("element number is not equal")
-            continue
-
-        try:
-            csi_raw_data = json.loads(csi_data[-1])
-        except json.JSONDecodeError:
-            print(f"data is incomplete")
-            continue
-
-        if len(csi_raw_data) != 128 and len(csi_raw_data) != 256 and len(csi_raw_data) != 384:
-            print(f"element number is not equal: {len(csi_raw_data)}")
-            continue
-
-        csv_writer.writerow(csi_data)
-
-        # Rotate data to the left
-        csi_data_array2[:-1] = csi_data_array2[1:]
-
-        if len(csi_raw_data) == 128:
-            csi_vaid_subcarrier_len = CSI_DATA_LLFT_COLUMNS
-        else:
-            csi_vaid_subcarrier_len = CSI_DATA_COLUMNS
-
-        for i in range(csi_vaid_subcarrier_len):
-            #csi_data_array[-1][i] = complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2],
-            #                                csi_raw_data[csi_vaid_subcarrier_index[i] * 2 - 1])
-
-            # simpler data representation
-            csi_data_array2[-1][i] = csi_raw_data[csi_vaid_subcarrier_index[i] * 2]
+            outdata[-1][i] = csi_raw_data[csi_vaid_subcarrier_index[i] * 2]
             #csi_data_array[-1][i] = csi_raw_data[csi_vaid_subcarrier_index[i] * 2 - 1]
 
             #try:
@@ -375,7 +278,7 @@ class SubThread (QThread):
         self.csv_writer.writerow(DATA_COLUMNS_NAMES)
 
     def run(self):
-        csi_data_read_parse(self.serial_port, self.csv_writer)
+        csi_data_read_parse(self.serial_port, self.csv_writer, csi_data_array)
 
     def __del__(self):
         self.wait()
@@ -390,7 +293,7 @@ class SubThread2 (QThread):
         self.csv_writer.writerow(DATA_COLUMNS_NAMES)
 
     def run(self):
-        csi_data_read_parse2(self.serial_port, self.csv_writer)
+        csi_data_read_parse(self.serial_port, self.csv_writer, csi_data_array2)
 
     def __del__(self):
         self.wait()
