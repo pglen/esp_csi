@@ -35,16 +35,42 @@ from io import StringIO
 from PyQt5.Qt import *
 import pyqtgraph as pg
 #from pyqtgraph import PlotWidget
-import pyqtgraph as pq
 from PyQt5 import QtCore
-from PyQt5 import QtGui
-
-import matplotlib.pyplot as plt
+import pyqtgraph as pq
 
 import threading
 import time
+
 import math
-import random
+
+def SQRRT(vv, tt):
+    return math.sqrt(vv*vv + tt*tt)
+
+def deangle(vv, tt):
+
+    uu = 0
+    if tt != 0:
+        dd = abs(vv) / abs(tt)
+        uu = math.atan(dd)
+
+    #      +-     |   ++
+    #  -----------|---------------
+    #      --     |   +-
+
+    '''if vv > 0. and tt > 0.:
+        uu += 0
+    elif vv > 0. and tt < 0.:
+        uu += 1
+    elif vv < 0. and tt < 0.:
+        uu += 2
+    elif vv > 0. and tt < 0.:
+        uu += 3
+    else:
+        pass
+    '''
+    uuu = math.degrees(uu) / 10
+    #print(uu, uuu)
+    return uuu
 
 stopme = 0
 
@@ -110,62 +136,11 @@ csi_data_array4 = np.zeros(
 outdata3 = np.zeros(
     [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
 
-outdata4 = np.zeros(
-    [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
-
 def SQR(vv):
             return vv*vv
 
 xlabel = None
-logwin = None
 xsum = 0
-zsum = 0
-prog = 0
-stopser = 0
-imgidx = 0
-ilabel = []
-xpixmap = []
-
-def SQRRT(vv, tt):
-    return math.sqrt(vv*vv + tt*tt)
-
-def deangle(vv, tt):
-
-    uu = 0
-    if tt != 0:
-        dd = abs(vv) / abs(tt)
-        uu = math.atan(dd)
-
-    #      +-     |   ++
-    #  -----------|---------------
-    #      --     |   +-
-
-    '''if vv > 0. and tt > 0.:
-        uu += 0
-    elif vv > 0. and tt < 0.:
-        uu += 1
-    elif vv < 0. and tt < 0.:
-        uu += 2
-    elif vv > 0. and tt < 0.:
-        uu += 3
-    else:
-        pass
-    '''
-    uuu = math.degrees(uu) / 10
-    #print(uu, uuu)
-    return uuu
-
-def   onclick():
-      global stopser
-      stopser = 0
-
-def   onclick2():
-      global stopser
-      stopser = 1
-
-def   onclick4():
-      sys.exit()
-# ------------------------------------------------------------------------
 
 class FormWidget(QWidget):
 
@@ -173,54 +148,29 @@ class FormWidget(QWidget):
         super(FormWidget, self).__init__(parent)
         self.layout = QHBoxLayout(self)
 
-        self.button1 = QPushButton("&Start")
+        self.button1 = QPushButton("Button 1")
         self.layout.addWidget(self.button1)
-        self.button1.clicked.connect(onclick)
 
-        self.button2 = QPushButton("S&top")
+        self.button2 = QPushButton("Button 2")
         self.layout.addWidget(self.button2)
-        self.button2.clicked.connect(onclick2)
 
         self.button3 = QPushButton("Button 3")
         self.layout.addWidget(self.button3)
 
-        self.button4 = QPushButton("E&xit")
+        self.button4 = QPushButton("Button 4")
         self.layout.addWidget(self.button4)
-        self.button4.clicked.connect(onclick4)
-
-        global zlabel
-        zlabel = QLabel("zidle")
-        self.layout.addWidget(zlabel)
 
         global xlabel
-        xlabel = QLabel("xidle")
+        xlabel = QLabel("zidle")
         self.layout.addWidget(xlabel)
 
         self.setLayout(self.layout)
 
-    def onclick(self):
-        print("onclick")
-
 cnt = 0
-ztime = 0
 
 ii = []
 for i in range(len(csi_data_array[:, 0]) ):
     ii.append(i)
-
-arr =  []
-for aa in range(200):
-    arr2 = []
-    for bb in range(100):
-        #zz = random.randint(50, 255)
-        zz = 128
-        arr2.append(zz)
-    for bb in range(100):
-        #zz = random.randint(50, 255)
-        zz = 64
-        arr2.append(zz)
-
-    arr.append(arr2)
 
 class csi_data_graphical_window(QMainWindow):
     def __init__(self):
@@ -234,58 +184,28 @@ class csi_data_graphical_window(QMainWindow):
 
         self.setWindowTitle(serial_port + ' + ' + serial_port2)
 
-
-        # ppppppp   iii
-        # ppppppp
-        # lllllllllllll
-
-
         self.plotWidget_ted = pg.PlotWidget(self)
         #self.plotWidget_ted.setGeometry(QtCore.QRect(0, 0, 1280, 720))
-        self.plotWidget_ted.setYRange(-120, 120)
+        self.plotWidget_ted.setYRange(-80, 80)
         #self.plotWidget_ted.addLegend((10,1))
         self.plotWidget_ted.setTitle('CSI Scatter Plot')
 
-        self.plotWidget_ted2 = pg.PlotWidget(self)
+        #self.plotWidget_ted2 = pg.PlotWidget(self)
         #self.plotWidget_ted2.setGeometry(QtCore.QRect(0, 0, 1280, 720))
-        self.plotWidget_ted2.setYRange(-2000, 2000)
+        #self.plotWidget_ted2.setYRange(-100, 100)
         #self.plotWidget_ted2.addLegend((10,1))
 
-        global ilabel, xpixmap
-        ilabel = QLabel(self)
-        xpixmap = QPixmap.fromImage(QImage(200, 400, QImage.Format_RGB32))
-        #xpixmap = QPixmap.fromImage(QImage(200, 300, QImage.Format_ARGB32_Premultiplied))
-        xpixmap.fill(Qt.black)
-        ilabel.setPixmap(xpixmap)
-        #self.layout.addWidget(ilabel)
-
         self.main = QWidget(self)
-        self.sub_layout = QHBoxLayout(self.main)
-
-        self.main3 = QWidget(self)
-        self.sub_layout2 = QVBoxLayout(self.main3)
-        self.main3.setLayout(self.sub_layout2)
-        self.sub_layout2.addWidget(self.plotWidget_ted, stretch=2)
-        self.sub_layout2.addWidget(self.plotWidget_ted2)
-        self.main3.setLayout(self.sub_layout2)
-
-        self.sub_layout.addWidget(self.main3)
-        self.sub_layout.addWidget(ilabel)
-        self.main2 = QWidget(self)
-        self.main2.setLayout(self.sub_layout)
-
         self.main_layout = QVBoxLayout(self.main)
-        self.main_layout.addWidget(self.main2, stretch=2)
-
-        global logwin
-        logwin = QTextEdit()
-        logwin.setReadOnly(1)
-        self.main_layout.addWidget(logwin, stretch=1)
+        self.main_layout.addWidget(self.plotWidget_ted)
 
         self.form = FormWidget(self)
         self.main_layout.addWidget(self.form)
+        #self.main_layout.addWidget(self.plotWidget_ted2)
 
+        self.setLayout(self.main_layout)
         self.setCentralWidget(self.main)
+        #self.setCentralWidget(self)
 
         self.curve_list = []
 
@@ -319,122 +239,29 @@ class csi_data_graphical_window(QMainWindow):
             self.plotWidget_ted.addItem(curve3)
             self.curve_list.append(curve3)
 
-            curve4 = pg.ScatterPlotItem(ii,
-                outdata4[:, 0],
-                    size=1, brush=pg.mkBrush(200,200,200))
-
-            self.plotWidget_ted2.addItem(curve4)
-            self.curve_list.append(curve4)
-
-
         self.timer = pq.QtCore.QTimer()
         self.timer.timeout.connect(self.update_data)
-        self.timer.start(100)
+        self.timer.start(200)
+
 
     def update_data(self):
 
-        global cnt, xsum, zsum
-
-        global stopser
-        if stopser:
-            return
+        global cnt, xsum
 
         cnt += 1
 
         #print(csi_data_array.shape)
         #print(csi_data_array)
 
+
         #self.curve_list[0].setData(ii, self.csi_phase_array[:, 0])
         #self.curve_list[1].setData(ii, self.csi_phase_array3[:, 0])
 
         self.curve_list[0].setData(ii, csi_data_array[:, 0])
-        self.curve_list[1].setData(ii, csi_data_array2[:, 0])
+        self.curve_list[1].setData(ii, csi_data_array3[:, 0])
         self.curve_list[2].setData(ii, outdata3[:, 0])
-        self.curve_list[3].setData(ii, outdata4[:, 0])
 
         xlabel.setText("%.2f" % xsum)
-
-        global ztime
-        ztime += 1
-        if abs(zsum) > 1000:
-            zlabel.setText("Motion %.2f" % zsum)
-            ztime = 0
-
-        if ztime > 10:
-           zlabel.setText("Idle")
-
-        xxx =  "%.2f  "
-
-        logwin.update()
-        logwin.moveCursor(QTextCursor.End)
-        logwin.insertPlainText(xxx % zsum)
-        logwin.ensureCursorVisible()
-
-        txt = logwin.toPlainText()
-        if len(txt) > 3000:
-            logwin.clear()
-            logwin.insertPlainText(txt[1000:])
-
-        global xpixmap, imgidx
-        img = xpixmap.toImage()
-
-        #sss = img.size().width() * img.size().height() * 4
-        #print(sss, img.byteCount())
-        '''
-        # did not work
-        ptr = img.bits()
-        ptr.setsize(img.byteCount())
-        buf = ptr.asstring(img.byteCount())
-        buf2 = memoryview(buf)
-        buf3 = bytes(buf2)
-
-        ## view the data as a read-only numpy array
-        #arr = np.frombuffer(ptr, dtype=np.ubyte) #.reshape(img.height(), img.width(), 4)
-        ## view the data as a writable numpy array
-        arr = np.asarray(ptr) #.reshape(img.height(), img.width(), 4)
-        for aa in arr:
-            for bb in aa:
-                if bb[0] != 0:
-                    print(bb , end=' ')
-        print(arr.shape)
-        #print(buf2)
-        try:
-            #ret = img.loadFromData(QByteArray(buf3))
-            pass
-        except:
-            print(sys.exc_info())
-        '''
-
-        mxx = 0
-        for bb in range(200):
-            xx = abs(csi_data_array[bb][0]) # + 128
-            if xx > mxx:
-                mxx = xx
-        if mxx:
-            scale =  255 / mxx
-        else:
-            scale = 5
-        #print(mxx, scale)
-        scale = 4
-        for bb in range(200):
-            xx = csi_data_array[bb][0]
-            # normalize
-            #iii = int(abs(xx) * scale) & 255
-            iii = int((xx+mxx/2) * scale) & 255
-            #print(iii, end= ' ')
-            #if xx:
-            #    print(imgidx,aa,bb,iii)
-            #img.setPixelColor(bb, imgidx, QtGui.QColor(0, iii, 0, 255))
-            img.setPixel(bb, imgidx, iii << 8)
-            #outdata4[imgidx][0] = iii
-
-        xpixmap.convertFromImage(img)
-        ilabel.setPixmap(xpixmap)
-
-        imgidx += 1
-        if imgidx >= 400:
-            xpixmap.fill(Qt.black)
-            imgidx = 0
 
         if stopme:
             #print("stopme")
@@ -472,10 +299,6 @@ def csi_data_read_parse(port: str, csv_writer, outdata, outdata2):
         index = strings.find('CSI_DATA')
 
         if index == -1:
-            continue
-
-        global stopser
-        if stopser:
             continue
 
         csv_reader = csv.reader(StringIO(strings))
@@ -560,8 +383,6 @@ def csi_data_read_parse2(port: str, csv_writer, outdata, outdata2):
 # turnvector ratio to angle
 
 
-fcnt = 0
-
 def fill(csi_raw_datax, outdata, outdata2):
 
     #print(len(csi_raw_datax))
@@ -591,15 +412,16 @@ def fill(csi_raw_datax, outdata, outdata2):
             #                                csi_raw_data[csi_vaid_subcarrier_index[i] * 2 - 1])
             #csi_data_array[-1][i] = complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2],
             #                                0)
-        global zsum
+
         zsum = 0
         for i in range(csi_vaid_subcarrier_len // 2):
             try:
                 pass
-                #ppp = deangle(csi_data_array[i][0], csi_data_array2[i][0])
-                #nnn = deangle(csi_data_array3[i][0], csi_data_array4[i][0])
+                ppp = deangle(csi_data_array[i][0], csi_data_array2[i][0])
+                nnn = deangle(csi_data_array3[i][0], csi_data_array4[i][0])
+                outdata3[i][0] = ppp - nnn
 
-                zsum += csi_data_array[i][0]
+                zsum += (outdata3[i][0])
 
             except:
                 pass
@@ -608,19 +430,6 @@ def fill(csi_raw_datax, outdata, outdata2):
         xsum += (zsum - xsum) / 30
         #if zsum > xsum:
         #    xsum = zsum
-        global fcnt
-        #fcnt += 1
-        #if fcnt > 10:
-        #    #xxx += "\r"
-        #    fcnt = 0
-        global prog
-
-        if prog >= 199:
-           outdata4[:-1] = outdata4[1:]
-        else:
-            prog += 1
-
-        outdata4[prog][0] = zsum
 
     except:
         print("fill", sys.exc_info())
@@ -692,18 +501,14 @@ if __name__ == '__main__':
         description="Read CSI data from serial port and display it graphically")
     parser.add_argument('-p', '--port', dest='port', action='store', required=True,
                         help="Serial port number of csv_recv device")
-    #parser.add_argument('-t', '--port2', dest='port2', action='store', required=True,
-    #                    help="Second Serial port number of csv_recv device")
+    parser.add_argument('-t', '--port2', dest='port2', action='store', required=True,
+                        help="Second Serial port number of csv_recv device")
     parser.add_argument('-s', '--store', dest='store_file', action='store', default='./csi_data.csv',
                         help="Save the data printed by the serial port to a file")
 
     args = parser.parse_args()
     serial_port = args.port
-
-    if hasattr(args, "port2"):
-        serial_port2 = args.port2
-    else:
-        serial_port2 = ""
+    serial_port2 = args.port2
 
     file_name = args.store_file
     file_name2 = args.store_file + '2'
@@ -715,9 +520,8 @@ if __name__ == '__main__':
     subthread = SubThread(serial_port, file_name)
     subthread.start()
 
-    if serial_port2:
-        subthread2 = SubThread2(serial_port2, file_name2)
-        subthread2.start()
+    subthread2 = SubThread2(serial_port2, file_name2)
+    subthread2.start()
 
 
     sys.exit(app.exec())

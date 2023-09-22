@@ -418,12 +418,10 @@ class csi_data_graphical_window(QMainWindow):
         scale = 4
         for bb in range(200):
             xx = csi_data_array[bb][0]
-            # normalize
-            #iii = int(abs(xx) * scale) & 255
-            iii = int((xx+mxx/2) * scale) & 255
-            #print(iii, end= ' ')
+            iii = int(abs(xx) * scale) & 255
             #if xx:
             #    print(imgidx,aa,bb,iii)
+
             #img.setPixelColor(bb, imgidx, QtGui.QColor(0, iii, 0, 255))
             img.setPixel(bb, imgidx, iii << 8)
             #outdata4[imgidx][0] = iii
@@ -431,8 +429,9 @@ class csi_data_graphical_window(QMainWindow):
         xpixmap.convertFromImage(img)
         ilabel.setPixmap(xpixmap)
 
+
         imgidx += 1
-        if imgidx >= 400:
+        if imgidx >= 300:
             xpixmap.fill(Qt.black)
             imgidx = 0
 
