@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+
+<!--
+		Generated using Markdown to HTML Converter by Chris Pyles.
+		More at https://github.com/chrispyles/markdown-to-html
+-->
+
+<html>
+<head>
+	<title>page title</title>
+	<meta name="description" content="page description">
+	<meta name="author" content="page author">
+	<!-- <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap" rel="stylesheet"> -->
+
+	<!-- Boostrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    
+	<style type="text/css">
+
+		/* CSS for MD to HTML Converter
+			by Chris Pyles
+
+    	body {
+    		margin-top: -27px;
+    		margin-left: 0;
+    		background-color: #00b0da;
+    	}
+
+		h1, h2, h3, h4, h5, h6 {
+			font-family: '=', sans-serif;
+			font-weight: 600;
+		}
+
+		h1, h2 {
+			letter-spacing: 1px;
+		}
+
+		h1 {
+			font-size: 30pt;
+		}
+
+		h2 {
+			font-size: 20pt;
+		}
+
+		h3 {
+			font-size: 14pt;
+		}
+
+		p, ul, th, td, ol {
+			font-family: '=', sans-serif;
+			font-size: 12pt;
+		}
+
+		p#header {
+			color: white;
+			padding-left: 235px;
+		}
+
+		ul.nav {
+			list-style-type: none;
+			padding-left: 15px;
+		}
+
+		li.nav {
+			padding-left: 20px;
+			width: 230px;
+		}
+
+		li.nav:hover {
+			background-color: rgba(256, 256, 256, 0.5);
+		}
+
+		th, td {
+			border-top: 1px solid black;
+			border-left: 1px solid black;
+			text-align: center;
+			padding: 5px 2px;
+		}
+
+		th {
+			font-weight: 600;
+		}
+
+		div {
+			width: 800px;
+			margin: 0 0 0 255px;
+			background-color: white;
+			padding: 0 20px;
+			margin-top: -27px;
+		}
+
+		div#top {
+			background-color: #46535e;
+			margin-top: 27px;
+			width: 100%;
+			height: 52px;
+			margin-left: 0;
+			position: fixed;
+			z-index: 1;
+		}
+
+		div#body {
+			position: absolute;
+			margin-top: 60px;
+			overflow: scroll;
+		}
+
+		table {
+			width: 75%;
+			margin: 0 auto;
+			border-right: 1px solid black;
+			border-bottom: 1px solid black;
+			border-spacing: 0;
+			table-layout: fixed;
+		}
+
+		table#header {
+			width: 100%;
+		    height: auto;
+		    border: none;
+		}
+
+		p.code {
+			width: 95%;
+			margin: 10px auto;
+			padding: 10px;
+			background-color: rgba(222, 222, 222, 0.5);
+		}
+
+		nav {
+			position: fixed;
+			width: 250px;
+			padding-left: 5px;
+			height: 100%;
+			background-color: #46535e;
+			color: white;
+			margin-top: 36px;
+			padding-top: 6px;
+			z-index: 2;
+		}
+
+		a.nav:link, a.nav:hover, a.nav:visited, a.nav:active {
+			color: white;
+		}
+
+		*/
+
+		/* Resize div for Pygments. */
+		div.highlight {
+			font-size: 12pt;
+			width: 98%;
+			margin: 10px auto;
+			padding: 10px;
+			background-color: #1d1e19;
+			color: #f6f7ee !important;
+			overflow: scroll;
+			border-radius: 5px;
+		}
+
+		pre {
+			margin: 0;
+			color: #f6f7ee !important;
+		}
+
+		.p {
+			color: #f6f7ee !important;
+		}
+
+		/* Below is imported the style from Pygments. */
+
+		pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hll { background-color: #ffffcc }
+.c { color: #fd8700; font-style: italic } /* Comment */
+.g { color: #fd8700 } /* Generic */
+.k { color: #53d1ed; font-weight: bold } /* Keyword */
+.n { color: #f6f7ee } /* Name */
+.o { color: #f7005f } /* Operator */
+.ch { color: #fd8700; font-style: italic } /* Comment.Hashbang */
+.cm { color: #fd8700; font-style: italic } /* Comment.Multiline */
+.cp { color: #fd8700; font-style: italic } /* Comment.Preproc */
+.cpf { color: #fd8700; font-style: italic } /* Comment.PreprocFile */
+.c1 { color: #fd8700; font-style: italic } /* Comment.Single */
+.cs { color: #fd8700; font-style: italic } /* Comment.Special */
+.gd { color: #fd8700 } /* Generic.Deleted */
+.ge { color: #fd8700 } /* Generic.Emph */
+.gr { color: #fd8700 } /* Generic.Error */
+.gh { color: #fd8700 } /* Generic.Heading */
+.gi { color: #fd8700 } /* Generic.Inserted */
+.go { color: #fd8700 } /* Generic.Output */
+.gp { color: #fd8700 } /* Generic.Prompt */
+.gs { color: #fd8700 } /* Generic.Strong */
+.gu { color: #fd8700 } /* Generic.Subheading */
+.gt { color: #fd8700 } /* Generic.Traceback */
+.kc { color: #53d1ed; font-weight: bold } /* Keyword.Constant */
+.kd { color: #53d1ed; font-weight: bold } /* Keyword.Declaration */
+.kn { color: #53d1ed; font-weight: bold } /* Keyword.Namespace */
+.kp { color: #53d1ed; font-weight: bold } /* Keyword.Pseudo */
+.kr { color: #53d1ed; font-weight: bold } /* Keyword.Reserved */
+.kt { color: #53d1ed; font-weight: bold } /* Keyword.Type */
+.m { color: #9d60ff } /* Literal.Number */
+.s { color: #e0d75a } /* Literal.String */
+.na { color: #f6f7ee } /* Name.Attribute */
+.nb { color: #f6f7ee } /* Name.Builtin */
+.nc { color: #53d1ed; font-weight: bold } /* Name.Class */
+.no { color: #f6f7ee } /* Name.Constant */
+.nd { color: #f6f7ee } /* Name.Decorator */
+.ni { color: #f6f7ee } /* Name.Entity */
+.ne { color: #f6f7ee } /* Name.Exception */
+.nf { color: #96e309 } /* Name.Function */
+.nl { color: #f6f7ee } /* Name.Label */
+.nn { color: #f6f7ee } /* Name.Namespace */
+.nx { color: #f6f7ee } /* Name.Other */
+.py { color: #f6f7ee } /* Name.Property */
+.nt { color: #f6f7ee } /* Name.Tag */
+.nv { color: #f6f7ee } /* Name.Variable */
+.ow { color: #f7005f } /* Operator.Word */
+.mb { color: #9d60ff } /* Literal.Number.Bin */
+.mf { color: #9d60ff } /* Literal.Number.Float */
+.mh { color: #9d60ff } /* Literal.Number.Hex */
+.mi { color: #9d60ff } /* Literal.Number.Integer */
+.mo { color: #9d60ff } /* Literal.Number.Oct */
+.sa { color: #e0d75a } /* Literal.String.Affix */
+.sb { color: #e0d75a } /* Literal.String.Backtick */
+.sc { color: #e0d75a } /* Literal.String.Char */
+.dl { color: #e0d75a } /* Literal.String.Delimiter */
+.sd { color: #e0d75a } /* Literal.String.Doc */
+.s2 { color: #e0d75a } /* Literal.String.Double */
+.se { color: #e0d75a } /* Literal.String.Escape */
+.sh { color: #e0d75a } /* Literal.String.Heredoc */
+.si { color: #e0d75a } /* Literal.String.Interpol */
+.sx { color: #e0d75a } /* Literal.String.Other */
+.sr { color: #e0d75a } /* Literal.String.Regex */
+.s1 { color: #e0d75a } /* Literal.String.Single */
+.ss { color: #e0d75a } /* Literal.String.Symbol */
+.bp { color: #f6f7ee } /* Name.Builtin.Pseudo */
+.fm { color: #96e309 } /* Name.Function.Magic */
+.vc { color: #f6f7ee } /* Name.Variable.Class */
+.vg { color: #f6f7ee } /* Name.Variable.Global */
+.vi { color: #f6f7ee } /* Name.Variable.Instance */
+.vm { color: #f6f7ee } /* Name.Variable.Magic */
+.il { color: #9d60ff } /* Literal.Number.Integer.Long */
+
+	</style>
+	
+</head>
+<body><nav class="navbar navbar-expand-md navbar-light bg-light">
+	
+	<a class="navbar-brand" href="#">navigation test menu title</a>
+	
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    	<span class="navbar-toggler-icon"></span>
+ 	</button>
+
+ 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+ 		<ul class="navbar-nav ml-auto">
+				<li class="nav-item active"><a class="nav-link" href="HTML file path">Test Link</a></li>
+</ul></div></nav>
+
+<div class="container" id="body">
+
+<h1>ESP-CSI</h1>
+
+<p>The main purpose of this project is to show the use of ESP-WIFI-CSI. The
+human body detection algorithm is still being optimized. You can get more
+accurate results through machine learning, neural network and other
+algorithms based on the original CSI data.</p>
+
+<p>Screenshots:</p>
+
+<p><img src="screen.png" alt="Screen Shot of CSI" /></p>
+
+<h2>1 Introduction</h2>
+
+<h3>1.1 Introduction to CSI</h3>
+
+<p>Channel state information (CSI) includes specific indicators such as
+carrier signal strength, amplitude, phase, and signal delay. These
+indicators reveal the signal scattering, reflection, and power attenuation
+phenomena that occur with the carrier as the transmission distance changes.
+It can be used to measure the channel status of the wireless network in
+Wi-Fi communication. By analyzing and studying the changes in CSI, we can
+conversely speculate on the changes in the physical environment that cause
+the changes in the channel state, that is, to achieve non-contact
+intelligent sensing. CSI is extremely sensitive to environmental changes.
+In addition to perceiving environmental changes caused by large movements
+such as walking and running of people or animals, it can also capture
+subtle movements caused by small movements such as breathing and chewing of
+people or animals in a static environment.</p>
+
+<h3>1.2 The relationship between CSI and RSSI</h3>
+
+<ol>
+<li><p><strong>Level of detail:</strong> CSI provides more detailed information about the
+wireless channel, including amplitude, phase, and frequency response. RSSI,
+on the other hand, only provides a general measurement of signal strength.</p></li>
+<li><p><strong>Applications:</strong> Wi-Fi CSI is particularly useful for advanced
+applications that require fine-grained analysis of the wireless channel,
+such as indoor localization, gesture recognition, and activity detection.
+RSSI is commonly used for basic tasks like signal strength estimation and
+basic proximity-based applications.</p></li>
+<li><p><strong>Accuracy:</strong> CSI can offer higher accuracy in certain applications
+compared to RSSI. It allows for more precise localization and tracking, as
+well as better differentiation between different actions or gestures.</p></li>
+<li><p><strong>Hardware support:</strong> Both CSI and RSSI can be obtained from standard
+Wi-Fi receivers, but CSI requires more advanced hardware capabilities to
+capture and process the detailed channel information. RSSI, being a simpler
+measurement, can be obtained with most Wi-Fi receivers.</p></li>
+</ol>
+
+<p>In summary, Wi-Fi CSI provides more detailed and fine-grained information
+about the wireless channel, while RSSI is a simpler measurement of signal
+strength. CSI enables more advanced applications but requires more
+sophisticated hardware and analysis techniques.</p>
+
+<h3>1.3 Advantages of CSI</h3>
+
+<p>CSI is a physical layer characteristic.Compared with other indicators, CSI
+amplitude shows some advantages:</p>
+
+<ol>
+<li><strong>Anti-interference:</strong> CSI amplitude is essentially the attenuation
+coefficient of a set of channels. As long as the channel itself does not
+change, it is quite robust to interference from power adaptors and other
+jumpers.</li>
+<li><strong>More fine-grained:</strong> CSI does not use synthetic values ​​(such as
+RSSI) to measure the channel, but decomposes the entire channel measurement
+into sub-carriers, and estimates the frequency response of each
+sub-carrier, so as to determine the channel in the frequency domain. Make a
+more fine-grained description.</li>
+</ol>
+
+<h3>1.4 Espressif CSI Advantage</h3>
+
+<ol>
+<li><strong>All ESP32 series support CSI:</strong> ESP32 / ESP32-S2 / ESP32-C3 / ESP32-S3
+/ ESP32-C6.</li>
+<li><strong>Powerful ecology:</strong> Espressif is a global leader in the field of Wi-Fi
+MCUs, combining CSI with existing IOT equipment.</li>
+<li><strong>More information:</strong> Such as RSSI, RF noise floor, reception time and
+antenna <code>rx_ctrl</code> field.</li>
+<li><strong>Bluetooth Assist:</strong> ESP32 also supports BLE, for example, it can scan
+surrounding devices to assist detection.</li>
+<li><strong>Powerful processing capability:</strong> ESP32 CPU handles dual-core, 240MHz,
+AI instructions. Can run machine learning and neural networks.</li>
+</ol>
+
+<h2>2 CSI Application</h2>
+
+<h3>2.1 Intruder detection</h3>
+
+<p>Select high-sensitivity sub-carrier combinations and signals from
+non-line-of-sight path directions in different multipath propagation
+environments, thereby enhancing the sensitivity of passive person detection
+and expanding the detection range. This method can form "no blind spot"
+intruder detection in security applications. The multipath propagation
+characteristics of wireless signals indoors make wireless perception have
+natural advantages in sensing range and directionality.</p>
+
+<h3>2.2 Positioning and ranging</h3>
+
+<p>You can learn from the RSSI method and use CSI as a more informative
+fingerprint (including information on signal amplitude and phase on
+multiple subcarriers), or rely on a frequency selective attenuation model
+for more accurate ranging.</p>
+
+<h3>2.3 Human activity detection and recognition</h3>
+
+<p>Use CSI's high sensitivity to environmental changes to recognize human
+movements, gestures, breathing and other small movements and daily
+activities.</p>
+
+<h2>3 Getting Started</h2>
+
+<p>The Getting Started project can be found in the
+<a href="./examples/console_test">examples/console_test</a> directory. It will help
+you build a human activity detection application. See:
+<a href="./examples/console_test/README.md">README</a>.</p>
+
+<h2>4 How to get CSI</h2>
+
+<h3>4.1 Get router CSI</h3>
+
+<p><img src="docs/_static/get_router_csi.png" width="550"></p>
+
+<ul>
+<li><strong>How ​​to implement:</strong> ESP32 sends a Ping packet to the router, and
+receives the CSI information carried in the Ping Replay returned by the
+router.</li>
+<li><strong>Advantage:</strong> Only one ESP32 plus router can be completed.</li>
+<li><strong>Disadvantages:</strong> Depends on the router, such as the location of the
+router, the supported Wi-Fi protocol, etc.</li>
+<li><strong>Applicable scenario:</strong> There is only one ESP32 in the environment, and
+there is a router in the detection environment.</li>
+</ul>
+
+<h3>4.2 Get CSI between devices</h3>
+
+<p><img src="docs/_static/get_device_csi.png" width="550"></p>
+
+<ul>
+<li><strong>How ​​to implement:</strong> ESP32 A and B both send Ping packets to the
+router, and ESP32 A receives the CSI information carried in the Ping Replay
+returned by ESP32 B, which is a supplement to the first detection scenario.</li>
+<li><strong>Advantage:</strong> Does not depend on the location of the router, and is not
+affected by other devices connected under the router.</li>
+<li><strong>Disadvantage:</strong> Depends on the Wi-Fi protocol supported by the router,
+environment.</li>
+<li><strong>Applicable scenario:</strong> There must be more than two ESP32s in the
+environment.</li>
+</ul>
+
+<h3>4.3 Get CSI specific devices</h3>
+
+<p><img src="docs/_static/get_broadcast_csi.png" width="550"></p>
+
+<ul>
+<li><strong>How ​​to implement:</strong> The packet sending device continuously switches
+channels to send out packets. ESP32 A, B, and C all obtain the CSI
+information carried in the broadcast packet of the packet sending device.
+This method has the highest detection accuracy and reliability.</li>
+<li><strong>Advantages:</strong> The completion is not affected by the router, and the
+detection accuracy is high. When there are multiple devices in the
+environment, only one packet sending device will cause little interference
+to the network environment.</li>
+<li><strong>Disadvantages:</strong> In addition to the ordinary ESP32, it is also
+necessary to add a special package issuing equipment, the cost is the same
+and higher.</li>
+<li><strong>Applicable scenarios:</strong> Suitable for scenarios that require high
+accuracy and multi-device cluster positioning.</li>
+</ul>
+
+<h2>5 Note</h2>
+
+<ol>
+<li>The effect of external IPEX antenna is better than PCB antenna, PCB
+antenna has directivity.</li>
+<li>Test in an unmanned environment. Avoid the influence of other people's
+activities on test results.</li>
+</ol>
+
+<h2>6 Related resources</h2>
+
+<ul>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/index.html">ESP-IDF Programming
+Guide</a>
+is the documentation for the Espressif IoT development framework.</li>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html#wi-fi-channel-state-information">ESP-WIFI-CSI
+Guide</a>
+is the use of ESP-WIFI-CSI Description.</li>
+<li>If you find a bug or have a feature request, you can submit it on
+<a href="https://github.com/espressif/esp-csi/issues">Issues</a> on GitHub. Please
+check to see if your question already exists in the existing Issues before
+submitting it.</li>
+</ul>
+
+<h2>Reference</h2>
+
+<ol>
+<li><a href="http://rfpose.csail.mit.edu/">Through-Wall Human Pose Estimation Using Radio
+Signals</a></li>
+<li><a href="https://github.com/Marsrocky/Awesome-WiFi-CSI-Sensing#awesome-wifi-sensing">A list of awesome papers and cool resources on WiFi CSI
+sensing</a></li>
+</ol>
+
+</div></body>
+</html>
