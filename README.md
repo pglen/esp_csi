@@ -1,8 +1,10 @@
 # ESP-CSI
 
 The main purpose of this project is to show the use of ESP-WIFI-CSI. The
-human body detection algorithm is still being optimized. You can get more
-accurate results through machine learning, neural network and other
+human body detection / Object detection algorithm is still being
+optimized.
+
+One can get more accurate results through machine learning, neural network and other
 algorithms based on the original CSI data.
 
 Screenshots:
