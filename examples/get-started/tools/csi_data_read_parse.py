@@ -46,6 +46,9 @@ import time
 import math
 import random
 
+from PIL import Image, ImageDraw
+from PIL import ImageQt
+
 stopme = 0
 
 # Reduce displayed waveforms to avoid display freezes
@@ -113,6 +116,9 @@ outdata3 = np.zeros(
 outdata4 = np.zeros(
     [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
 
+traindata = np.zeros(
+    [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
+
 def SQR(vv):
             return vv*vv
 
@@ -125,6 +131,7 @@ stopser = 0
 imgidx = 0
 ilabel = []
 xpixmap = []
+ximage = []
 
 def SQRRT(vv, tt):
     return math.sqrt(vv*vv + tt*tt)
@@ -181,12 +188,16 @@ class FormWidget(QWidget):
         self.layout.addWidget(self.button2)
         self.button2.clicked.connect(onclick2)
 
-        self.button3 = QPushButton("Button 3")
+        self.button3 = QPushButton("T&rain")
         self.layout.addWidget(self.button3)
 
-        self.button4 = QPushButton("E&xit")
-        self.layout.addWidget(self.button4)
-        self.button4.clicked.connect(onclick4)
+        global tlabel
+        tlabel = QLineEdit("base")
+        tlabel.setMaxLength(55)
+        tlabel.setFixedSize(200, 30)#tlabel.height())
+        #tlabel.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        #tlabel.resize(265, tlabel.height());
+        self.layout.addWidget(tlabel)
 
         global zlabel
         zlabel = QLabel("zidle")
@@ -195,6 +206,10 @@ class FormWidget(QWidget):
         global xlabel
         xlabel = QLabel("xidle")
         self.layout.addWidget(xlabel)
+
+        self.button4 = QPushButton("E&xit")
+        self.layout.addWidget(self.button4)
+        self.button4.clicked.connect(onclick4)
 
         self.setLayout(self.layout)
 
@@ -234,11 +249,10 @@ class csi_data_graphical_window(QMainWindow):
 
         self.setWindowTitle(serial_port + ' + ' + serial_port2)
 
-
+        # control map
         # ppppppp   iii
         # ppppppp
         # lllllllllllll
-
 
         self.plotWidget_ted = pg.PlotWidget(self)
         #self.plotWidget_ted.setGeometry(QtCore.QRect(0, 0, 1280, 720))
@@ -251,13 +265,19 @@ class csi_data_graphical_window(QMainWindow):
         self.plotWidget_ted2.setYRange(-2000, 2000)
         #self.plotWidget_ted2.addLegend((10,1))
 
-        global ilabel, xpixmap
+        global ilabel, ylabel, xpixmap, zimage
         ilabel = QLabel(self)
         xpixmap = QPixmap.fromImage(QImage(200, 400, QImage.Format_RGB32))
         #xpixmap = QPixmap.fromImage(QImage(200, 300, QImage.Format_ARGB32_Premultiplied))
         xpixmap.fill(Qt.black)
-        ilabel.setPixmap(xpixmap)
+        #ilabel.setPixmap(xpixmap)
         #self.layout.addWidget(ilabel)
+
+        zimage = Image.new("RGBA", (400,400), color=(000,000,000) )
+        #ximage.show()
+        ylabel = QLabel(self)
+        pix = QPixmap.fromImage(ImageQt.ImageQt(zimage))
+        ylabel.setPixmap(pix)
 
         self.main = QWidget(self)
         self.sub_layout = QHBoxLayout(self.main)
@@ -271,6 +291,7 @@ class csi_data_graphical_window(QMainWindow):
 
         self.sub_layout.addWidget(self.main3)
         self.sub_layout.addWidget(ilabel)
+        self.sub_layout.addWidget(ylabel)
         self.main2 = QWidget(self)
         self.main2.setLayout(self.sub_layout)
 
@@ -416,6 +437,7 @@ class csi_data_graphical_window(QMainWindow):
             scale = 5
         #print(mxx, scale)
         scale = 4
+        '''
         for bb in range(200):
             xx = csi_data_array[bb][0]
             # normalize
@@ -427,13 +449,31 @@ class csi_data_graphical_window(QMainWindow):
             #img.setPixelColor(bb, imgidx, QtGui.QColor(0, iii, 0, 255))
             img.setPixel(bb, imgidx, iii << 8)
             #outdata4[imgidx][0] = iii
+        '''
 
-        xpixmap.convertFromImage(img)
-        ilabel.setPixmap(xpixmap)
+        #xpixmap.convertFromImage(img)
+        #ilabel.setPixmap(xpixmap)
+        bw =  Image.new("RGBA", (2400, 1), color=(000,000,000) )
+        ptr = list(bw.getdata())
+        #print(ptr)
+        for bb in range(200):
+            xx = csi_data_array[bb][0]
+            # normalize
+            iii = int((xx+mxx/2) * scale) & 255
+            ptr[2*bb] = (0, iii, 0)
+            ptr[2*bb+1] = (0, iii, 0)
+        bw.putdata(ptr)
+
+        zimage.paste(bw, box=( 0,  imgidx,)  )
+
+        pix = QPixmap.fromImage(ImageQt.ImageQt(zimage))
+        ylabel.setPixmap(pix)
 
         imgidx += 1
         if imgidx >= 400:
-            xpixmap.fill(Qt.black)
+            #xpixmap.fill(Qt.black)
+            draw = ImageDraw.Draw(zimage)
+            draw.rectangle((0, 0, 400, 400), fill=(0, 0, 0, 255))
             imgidx = 0
 
         if stopme:

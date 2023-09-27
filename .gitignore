@@ -1,6 +1,10 @@
 # Prerequisites
 *.d
 
+# data
+*.csv
+*.csv2
+
 # Object files
 *.o
 *.ko
