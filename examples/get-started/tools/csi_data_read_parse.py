@@ -45,6 +45,7 @@ import threading
 import time
 import math
 import random
+import queue
 
 from PIL import Image, ImageDraw
 from PIL import ImageQt
@@ -91,10 +92,13 @@ CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
 # csi_vaid_subcarrier_index += [i for i in range(163, 191)]  # 28  White
 
 CSI_DATA_INDEX = 200  # buffer size
+CSI_TRAIN_SIZE = 20
 #CSI_DATA_COLUMNS = len(csi_vaid_subcarrier_index)
 CSI_DATA_COLUMNS = 300
 DATA_COLUMNS_NAMES = ["type", "id", "mac", "rssi", "rate", "sig_mode", "mcs", "bandwidth", "smoothing", "not_sounding", "aggregation", "stbc", "fec_coding",
                       "sgi", "noise_floor", "ampdu_cnt", "channel", "secondary_channel", "local_timestamp", "ant", "sig_len", "rx_state", "len", "first_word", "data"]
+
+CSI_DATA_ARR_SIZE = 384
 #csi_data_array = np.zeros(
 #    [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.complex64)
 
@@ -116,11 +120,19 @@ outdata3 = np.zeros(
 outdata4 = np.zeros(
     [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
 
-traindata = np.zeros(
-    [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
+currsig = np.zeros(
+    [ CSI_DATA_ARR_SIZE], dtype=np.float64)
+
+currsig2 = np.zeros(
+    [ CSI_DATA_ARR_SIZE], dtype=np.float64)
+
+traindict  = {}
+traindict2 = {}
+
+qqq = queue.Queue()
 
 def SQR(vv):
-            return vv*vv
+    return vv*vv
 
 xlabel = None
 logwin = None
@@ -128,13 +140,78 @@ xsum = 0
 zsum = 0
 prog = 0
 stopser = 0
+train = 0
+recog = 0
 imgidx = 0
 ilabel = []
-xpixmap = []
 ximage = []
+datacnt = 0
+offsx = 0
+
+cnt = 0
+ztime = 0
+
+iiz = []
+for i in range(len(csi_data_array[:, 0]) ):
+    iiz.append(i)
+
+def strpad(strx, lenx):
+    lll = len(strx)
+    if lenx <= lll:
+        return strx
+    return strx + ' ' * (lenx-lll)
+
+def worker():
+
+    if qqq.empty():
+        return
+
+    while True:
+        try:
+            item = qqq.get(False)
+        except queue.Empty:
+            #return
+            break
+
+        if not item:
+            return
+
+        logwin.update()
+        logwin.moveCursor(QTextCursor.End)
+        logwin.insertPlainText(item)
+        logwin.ensureCursorVisible()
+        txt = logwin.toPlainText()
+
+    if len(txt) > 3000:
+        logwin.clear()
+        logwin.insertPlainText(txt[1000:])
+
+    qqq.task_done()
+
+
+# imitate some features of print
+
+def logx(*strx, **keyw):
+
+    sss = ""
+    for aa in strx:
+       sss += str(aa) + ' '
+
+    if 'end' in keyw:
+        sss += keyw['end']
+    else:
+        sss += '\n'
+
+    # submit for aync processing
+    qqq.put(sss)
 
 def SQRRT(vv, tt):
     return math.sqrt(vv*vv + tt*tt)
+
+def parr(namex, arrx):
+    print (namex, end= ' ')
+    for aa in arrx[6:9]:
+        print(aa[6:9])
 
 def deangle(vv, tt):
 
@@ -170,7 +247,25 @@ def   onclick2():
       global stopser
       stopser = 1
 
+def   onclick3():
+      global train, recog
+      logx("Train started with '", tlabel.text(), "'")
+      traindict [tlabel.text()] =  np.zeros(
+                [CSI_TRAIN_SIZE, CSI_DATA_ARR_SIZE], dtype=np.float64)
+      traindict2[tlabel.text()] =  np.zeros(
+                [CSI_TRAIN_SIZE, CSI_DATA_ARR_SIZE], dtype=np.float64)
+
+      #print (traindict)
+      #print (traindict2)
+      train = 1
+      recog = 0
+
 def   onclick4():
+      global train, recog
+      train = 0
+      recog = not recog
+
+def   onclick5():
       sys.exit()
 # ------------------------------------------------------------------------
 
@@ -190,14 +285,19 @@ class FormWidget(QWidget):
 
         self.button3 = QPushButton("T&rain")
         self.layout.addWidget(self.button3)
+        self.button3.clicked.connect(onclick3)
 
         global tlabel
         tlabel = QLineEdit("base")
         tlabel.setMaxLength(55)
-        tlabel.setFixedSize(200, 30)#tlabel.height())
+        tlabel.setFixedSize(200, 30) #tlabel.height())
         #tlabel.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         #tlabel.resize(265, tlabel.height());
         self.layout.addWidget(tlabel)
+
+        self.button4 = QPushButton("R&ecog")
+        self.layout.addWidget(self.button4)
+        self.button4.clicked.connect(onclick4)
 
         global zlabel
         zlabel = QLabel("zidle")
@@ -207,35 +307,14 @@ class FormWidget(QWidget):
         xlabel = QLabel("xidle")
         self.layout.addWidget(xlabel)
 
-        self.button4 = QPushButton("E&xit")
-        self.layout.addWidget(self.button4)
-        self.button4.clicked.connect(onclick4)
+        self.button5 = QPushButton("E&xit")
+        self.layout.addWidget(self.button5)
+        self.button5.clicked.connect(onclick5)
 
         self.setLayout(self.layout)
 
     def onclick(self):
         print("onclick")
-
-cnt = 0
-ztime = 0
-
-ii = []
-for i in range(len(csi_data_array[:, 0]) ):
-    ii.append(i)
-
-arr =  []
-for aa in range(200):
-    arr2 = []
-    for bb in range(100):
-        #zz = random.randint(50, 255)
-        zz = 128
-        arr2.append(zz)
-    for bb in range(100):
-        #zz = random.randint(50, 255)
-        zz = 64
-        arr2.append(zz)
-
-    arr.append(arr2)
 
 class csi_data_graphical_window(QMainWindow):
     def __init__(self):
@@ -265,18 +344,15 @@ class csi_data_graphical_window(QMainWindow):
         self.plotWidget_ted2.setYRange(-2000, 2000)
         #self.plotWidget_ted2.addLegend((10,1))
 
-        global ilabel, ylabel, xpixmap, zimage
+        global ilabel, ylabel, yimage
         ilabel = QLabel(self)
         xpixmap = QPixmap.fromImage(QImage(200, 400, QImage.Format_RGB32))
-        #xpixmap = QPixmap.fromImage(QImage(200, 300, QImage.Format_ARGB32_Premultiplied))
         xpixmap.fill(Qt.black)
-        #ilabel.setPixmap(xpixmap)
-        #self.layout.addWidget(ilabel)
 
-        zimage = Image.new("RGBA", (400,400), color=(000,000,000) )
+        yimage = Image.new("RGBA", (400,400), color=(000,000,000) )
         #ximage.show()
         ylabel = QLabel(self)
-        pix = QPixmap.fromImage(ImageQt.ImageQt(zimage))
+        pix = QPixmap.fromImage(ImageQt.ImageQt(yimage))
         ylabel.setPixmap(pix)
 
         self.main = QWidget(self)
@@ -301,7 +377,24 @@ class csi_data_graphical_window(QMainWindow):
         global logwin
         logwin = QTextEdit()
         logwin.setReadOnly(1)
-        self.main_layout.addWidget(logwin, stretch=1)
+        doc = logwin.document();
+        font = doc.defaultFont();
+        font.setFamily("Courier New");
+        doc.setDefaultFont(font);
+
+        global yimage2, ylabel2
+        yimage2 = Image.new("RGBA", (400,200), color=(000,000,000) )
+        ylabel2 = QLabel(self)
+        pix2 = QPixmap.fromImage(ImageQt.ImageQt(yimage2))
+        ylabel2.setPixmap(pix2)
+
+        self.main4 = QWidget(self)
+        self.sub_layout3 = QHBoxLayout(self.main4)
+
+        self.sub_layout3.addWidget(logwin)
+        self.sub_layout3.addWidget(ylabel2)
+
+        self.main_layout.addWidget(self.main4, stretch=1)
 
         self.form = FormWidget(self)
         self.main_layout.addWidget(self.form)
@@ -356,6 +449,8 @@ class csi_data_graphical_window(QMainWindow):
 
         global cnt, xsum, zsum
 
+        worker()
+
         global stopser
         if stopser:
             return
@@ -365,13 +460,10 @@ class csi_data_graphical_window(QMainWindow):
         #print(csi_data_array.shape)
         #print(csi_data_array)
 
-        #self.curve_list[0].setData(ii, self.csi_phase_array[:, 0])
-        #self.curve_list[1].setData(ii, self.csi_phase_array3[:, 0])
-
-        self.curve_list[0].setData(ii, csi_data_array[:, 0])
-        self.curve_list[1].setData(ii, csi_data_array2[:, 0])
-        self.curve_list[2].setData(ii, outdata3[:, 0])
-        self.curve_list[3].setData(ii, outdata4[:, 0])
+        self.curve_list[0].setData(iiz, csi_data_array[:, 0])
+        self.curve_list[1].setData(iiz, csi_data_array2[:, 0])
+        self.curve_list[2].setData(iiz, outdata3[:, 0])
+        self.curve_list[3].setData(iiz, outdata4[:, 0])
 
         xlabel.setText("%.2f" % xsum)
 
@@ -380,51 +472,12 @@ class csi_data_graphical_window(QMainWindow):
         if abs(zsum) > 1000:
             zlabel.setText("Motion %.2f" % zsum)
             ztime = 0
-
         if ztime > 10:
            zlabel.setText("Idle")
 
-        xxx =  "%.2f  "
+        #logx("%.2f  " % zsum)
 
-        logwin.update()
-        logwin.moveCursor(QTextCursor.End)
-        logwin.insertPlainText(xxx % zsum)
-        logwin.ensureCursorVisible()
-
-        txt = logwin.toPlainText()
-        if len(txt) > 3000:
-            logwin.clear()
-            logwin.insertPlainText(txt[1000:])
-
-        global xpixmap, imgidx
-        img = xpixmap.toImage()
-
-        #sss = img.size().width() * img.size().height() * 4
-        #print(sss, img.byteCount())
-        '''
-        # did not work
-        ptr = img.bits()
-        ptr.setsize(img.byteCount())
-        buf = ptr.asstring(img.byteCount())
-        buf2 = memoryview(buf)
-        buf3 = bytes(buf2)
-
-        ## view the data as a read-only numpy array
-        #arr = np.frombuffer(ptr, dtype=np.ubyte) #.reshape(img.height(), img.width(), 4)
-        ## view the data as a writable numpy array
-        arr = np.asarray(ptr) #.reshape(img.height(), img.width(), 4)
-        for aa in arr:
-            for bb in aa:
-                if bb[0] != 0:
-                    print(bb , end=' ')
-        print(arr.shape)
-        #print(buf2)
-        try:
-            #ret = img.loadFromData(QByteArray(buf3))
-            pass
-        except:
-            print(sys.exc_info())
-        '''
+        global imgidx
 
         mxx = 0
         for bb in range(200):
@@ -437,42 +490,35 @@ class csi_data_graphical_window(QMainWindow):
             scale = 5
         #print(mxx, scale)
         scale = 4
-        '''
-        for bb in range(200):
-            xx = csi_data_array[bb][0]
-            # normalize
-            #iii = int(abs(xx) * scale) & 255
-            iii = int((xx+mxx/2) * scale) & 255
-            #print(iii, end= ' ')
-            #if xx:
-            #    print(imgidx,aa,bb,iii)
-            #img.setPixelColor(bb, imgidx, QtGui.QColor(0, iii, 0, 255))
-            img.setPixel(bb, imgidx, iii << 8)
-            #outdata4[imgidx][0] = iii
-        '''
-
-        #xpixmap.convertFromImage(img)
-        #ilabel.setPixmap(xpixmap)
-        bw =  Image.new("RGBA", (2400, 1), color=(000,000,000) )
+        bw =  Image.new("RGBA", (400, 1), color=(000,000,000) )
         ptr = list(bw.getdata())
         #print(ptr)
         for bb in range(200):
             xx = csi_data_array[bb][0]
             # normalize
             iii = int((xx+mxx/2) * scale) & 255
-            ptr[2*bb] = (0, iii, 0)
-            ptr[2*bb+1] = (0, iii, 0)
+            ptr[bb] = (0, iii, 0)
+            #ptr[2*bb+1] = (0, iii, 0)
+        bw.putdata(ptr)
+        yimage.paste(bw, box=( 0,  imgidx,)  )
+        bw =  Image.new("RGBA", (400, 1), color=(000,000,000) )
+        ptr = list(bw.getdata())
+        #print(ptr)
+        for bb in range(200):
+            xx = csi_data_array2[bb][0]
+            # normalize
+            iii = int((xx+mxx/2) * scale) & 255
+            ptr[bb] = (0, iii, 0)
+            #ptr[2*bb+1] = (0, iii, 0)
         bw.putdata(ptr)
 
-        zimage.paste(bw, box=( 0,  imgidx,)  )
-
-        pix = QPixmap.fromImage(ImageQt.ImageQt(zimage))
+        yimage.paste(bw, box=( 200,  imgidx,)  )
+        pix = QPixmap.fromImage(ImageQt.ImageQt(yimage))
         ylabel.setPixmap(pix)
 
         imgidx += 1
         if imgidx >= 400:
-            #xpixmap.fill(Qt.black)
-            draw = ImageDraw.Draw(zimage)
+            draw = ImageDraw.Draw(yimage)
             draw.rectangle((0, 0, 400, 400), fill=(0, 0, 0, 255))
             imgidx = 0
 
@@ -500,7 +546,7 @@ def csi_data_read_parse(port: str, csv_writer, outdata, outdata2):
         #=print("open success", port)
         pass
     else:
-        print("open failed")
+        print("open failed", port)
         return
 
     while True:
@@ -538,61 +584,6 @@ def csi_data_read_parse(port: str, csv_writer, outdata, outdata2):
         csv_writer.writerow(csi_data)
 
         fill(csi_raw_data, outdata, outdata2)
-
-    ser.close()
-    return
-
-def csi_data_read_parse2(port: str, csv_writer, outdata, outdata2):
-
-    ser = None
-    try:
-        ser = serial.Serial(port=port, baudrate=921600,
-                        bytesize=8, parity='N', stopbits=1)
-    except:
-        print("open", sys.exc_info())
-        global stopme
-        stopme = 1
-        return
-        #sys.exit()
-
-    if ser.isOpen():
-        #=print("open success", port)
-        pass
-    else:
-        print("open failed")
-        return
-
-    while True:
-        strings = str(ser.readline())
-        if not strings:
-            break
-
-        strings = strings.lstrip('b\'').rstrip('\\r\\n\'')
-        index = strings.find('CSI_DATA')
-
-        if index == -1:
-            continue
-
-        csv_reader = csv.reader(StringIO(strings))
-        csi_data = next(csv_reader)
-
-        if len(csi_data) != len(DATA_COLUMNS_NAMES):
-            print("element2 header number is not equal")
-            continue
-
-        try:
-            csi_raw_data3 = json.loads(csi_data[-1])
-        except json.JSONDecodeError:
-            print(f"data2 is incomplete")
-            continue
-
-        if len(csi_raw_data3) != 128 and len(csi_raw_data3) != 256 and len(csi_raw_data3) != 384:
-            print(f"element2 number is not equal: {len(csi_raw_data3)}")
-            continue
-
-        csv_writer.writerow(csi_data)
-
-        fill2(csi_raw_data3, outdata, outdata2)
 
     ser.close()
     return
@@ -646,15 +637,7 @@ def fill(csi_raw_datax, outdata, outdata2):
                 print("div", sys.exc_info())
 
         xsum += (zsum - xsum) / 30
-        #if zsum > xsum:
-        #    xsum = zsum
-        global fcnt
-        #fcnt += 1
-        #if fcnt > 10:
-        #    #xxx += "\r"
-        #    fcnt = 0
         global prog
-
         if prog >= 199:
            outdata4[:-1] = outdata4[1:]
         else:
@@ -662,33 +645,106 @@ def fill(csi_raw_datax, outdata, outdata2):
 
         outdata4[prog][0] = zsum
 
+        global train, datacnt, offsx
+        if train:
+            #print("Train", datacnt)
+            for aa in range(len(csi_raw_datax)// 2):
+                traindict[tlabel.text()][datacnt][aa] = csi_raw_datax[aa*2]
+                traindict2[tlabel.text()][datacnt][aa] = csi_raw_datax[aa*2-1]
+
+            datacnt += 1
+            if datacnt >= CSI_TRAIN_SIZE:
+                train = 0
+                drawtrain(offsx, traindict[tlabel.text()], traindict2[tlabel.text()])
+                logx("Training added at %d" % offsx)
+                offsx += datacnt +2
+                datacnt = 0
+
+        if recog:
+            recogx(csi_raw_datax)
     except:
         print("fill", sys.exc_info())
 
-def fill2(csi_raw_datax, outdata, outdata2):
+dcnt = 0
 
-    #print(len(csi_raw_datax))
+def recogx(csi_raw_datax):
 
-    if len(csi_raw_datax) == 128:
-        csi_vaid_subcarrier_len = CSI_DATA_LLFT_COLUMNS
-    else:
-        #csi_vaid_subcarrier_len = CSI_DATA_COLUMNS
-        csi_vaid_subcarrier_len = len(csi_raw_datax)
+    for aa in range(len(csi_raw_datax)// 2):
+        currsig[aa] = csi_raw_datax[aa*2]
+        #print("raw", currsig)
+    hit = 'none'; mxx2 = 0xffffffff
+    for aa in  traindict.keys():
+        mxx = 0xffffffff; ddd = []
+        for bb in traindict[aa]:
+            #for cc in range(len(currsig)):
+            for cc in range(55):
+                # Compare
+                ddd.append(SQR(currsig[150+cc] - bb[150+cc]))
+                #print ('%.2f#%.2f=%.2f  ' \
+                #        % (currsig[cc],  bb[cc], ddd), end='   ')
+            sum = 0
+            for dd in range(len(ddd)):
+                sum += ddd[dd]
+            sum /= len(ddd)
+            #print('%.2f' % sum, end = '  ')
+            if mxx > sum:
+                mxx = sum
 
-    # Rotate data to the left
-    #csi_data_array[:-1] = csi_data_array[1:]
-    #outdata[:-1] = outdata[1:]
+        #print(aa, '%.2f' % mxx, end = '  ')
+        if mxx2 > mxx:
+            mxx2 = mxx
+            hit = aa
+        #if mxx2 > sum:
+        #    mxx2 = sum
+        #    hit = aa
+    #print(hit, '%.2f' % mxx2)
 
-    try:
-        for i in range(csi_vaid_subcarrier_len // 2):
-            #csi_data_array[-1][i] = complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2],
-            #                                csi_raw_data[csi_vaid_subcarrier_index[i] * 2 - 1])
+    logx(strpad(hit, 8), strpad('%.2f' % mxx2, 8), end='  ')
+    global dcnt
+    dcnt += 1
+    if dcnt % 4 == 0:
+        logx()
 
-            outdata[i][0] = csi_raw_datax[i * 2]
-            outdata2[i][0] = csi_raw_datax[i * 2 -1]
+def drawtrain(offs, tdata, tdata2):
+    ret = len(tdata); scale = 4
+    for bb in range(len(tdata)):
+        mxx = 0
+        for cc in range(len(tdata[bb])):
+            xx = abs(tdata[bb][cc]) # + 128
+            if xx > mxx:
+                mxx = xx
+        if mxx:
+            scale =  255 / mxx
+        else:
+            scale = 5
+        #print(mxx, scale)
+        scale = 4
 
-    except:
-        print("fill2", sys.exc_info())
+        bw2 =  Image.new("RGBA", (400, 1), color=(000,000,000) )
+        ptr = list(bw2.getdata())
+        for cc in range(len(tdata[bb])):
+            xx = tdata[bb][cc]
+            # normalize
+            iii = int((xx+mxx/2) * scale) & 255
+            #iii = int((xx) * scale) & 255
+            ptr[cc] = (0, iii, 0)
+        bw2.putdata(ptr)
+        yimage2.paste(bw2, box=( 0,  offs + bb,)  )
+
+        bw2 =  Image.new("RGBA", (400, 1), color=(000,000,000) )
+        ptr = list(bw2.getdata())
+        for cc in range(len(tdata2[bb])):
+            xx = tdata2[bb][cc]
+            # normalize
+            iii = int((xx+mxx/2) * scale) & 255
+            #iii = int((xx) * scale) & 255
+            ptr[cc] = (0, iii, 0)
+        bw2.putdata(ptr)
+        yimage2.paste(bw2, box=( 200,  offs+bb,)  )
+
+    pix = QPixmap.fromImage(ImageQt.ImageQt(yimage2))
+    ylabel2.setPixmap(pix)
+    return ret
 
 
 class SubThread (QThread):
@@ -703,22 +759,6 @@ class SubThread (QThread):
     def run(self):
         csi_data_read_parse(self.serial_port, self.csv_writer,
                         csi_data_array, csi_data_array2)
-
-    def __del__(self):
-        self.wait()
-
-class SubThread2 (QThread):
-    def __init__(self, serial_port, save_file_name):
-        super().__init__()
-        self.serial_port = serial_port
-
-        save_file_fd = open(save_file_name, 'w')
-        self.csv_writer = csv.writer(save_file_fd)
-        self.csv_writer.writerow(DATA_COLUMNS_NAMES)
-
-    def run(self):
-        csi_data_read_parse2(self.serial_port, self.csv_writer,
-                                        csi_data_array3, csi_data_array4)
 
     def __del__(self):
         self.wait()
@@ -758,6 +798,5 @@ if __name__ == '__main__':
     if serial_port2:
         subthread2 = SubThread2(serial_port2, file_name2)
         subthread2.start()
-
 
     sys.exit(app.exec())
