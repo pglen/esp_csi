@@ -121,10 +121,10 @@ outdata4 = np.zeros(
     [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
 
 currsig = np.zeros(
-    [ CSI_DATA_ARR_SIZE], dtype=np.float64)
+    [ CSI_TRAIN_SIZE, CSI_DATA_ARR_SIZE], dtype=np.float64)
 
 currsig2 = np.zeros(
-    [ CSI_DATA_ARR_SIZE], dtype=np.float64)
+    [ CSI_TRAIN_SIZE, CSI_DATA_ARR_SIZE], dtype=np.float64)
 
 traindict  = {}
 traindict2 = {}
@@ -150,6 +150,7 @@ offsx = 0
 
 cnt = 0
 ztime = 0
+incnt = 0
 
 iiz = []
 for i in range(len(csi_data_array[:, 0]) ):
@@ -247,6 +248,18 @@ def   onclick2():
       global stopser
       stopser = 1
 
+def   onclick3a():
+      import re
+      #rrr = re.compile("[0-9]")
+      sss = re.split('([0-9])', tlabel.text())
+      if len(sss) == 1:
+        eee = sss[0] + '1'
+      else:
+        eee = sss[0] + str( int(sss[1])+1)
+      #print(eee)
+      tlabel.setText(eee)
+
+
 def   onclick3():
       global train, recog
       logx("Train started with '", tlabel.text(), "'")
@@ -255,15 +268,24 @@ def   onclick3():
       traindict2[tlabel.text()] =  np.zeros(
                 [CSI_TRAIN_SIZE, CSI_DATA_ARR_SIZE], dtype=np.float64)
 
+
       #print (traindict)
       #print (traindict2)
       train = 1
       recog = 0
+      form.button3.setDisabled(True)
+      form.button3a.setDisabled(True)
 
 def   onclick4():
-      global train, recog
+      global train, recog, form
       train = 0
       recog = not recog
+
+      if recog:
+        form.button4.setText("St&op")
+      else:
+        form.button4.setText("R&ecog")
+
 
 def   onclick5():
       sys.exit()
@@ -287,8 +309,12 @@ class FormWidget(QWidget):
         self.layout.addWidget(self.button3)
         self.button3.clicked.connect(onclick3)
 
+        self.button3a = QPushButton("cnt+")
+        self.layout.addWidget(self.button3a)
+        self.button3a.clicked.connect(onclick3a)
+
         global tlabel
-        tlabel = QLineEdit("base")
+        tlabel = QLineEdit("base1")
         tlabel.setMaxLength(55)
         tlabel.setFixedSize(200, 30) #tlabel.height())
         #tlabel.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
@@ -312,6 +338,8 @@ class FormWidget(QWidget):
         self.button5.clicked.connect(onclick5)
 
         self.setLayout(self.layout)
+        global form
+        form = self
 
     def onclick(self):
         print("onclick")
@@ -655,6 +683,8 @@ def fill(csi_raw_datax, outdata, outdata2):
             datacnt += 1
             if datacnt >= CSI_TRAIN_SIZE:
                 train = 0
+                form.button3.setDisabled(False)
+                form.button3a.setDisabled(False)
                 drawtrain(offsx, traindict[tlabel.text()], traindict2[tlabel.text()])
                 logx("Training added at %d" % offsx)
                 offsx += datacnt +2
@@ -667,19 +697,35 @@ def fill(csi_raw_datax, outdata, outdata2):
 
 dcnt = 0
 
+# s=signal d=dictionary
+# sssssssssssssssssssssssssssssssssssss  0
+# sssssssssssssssssssssssssssssssssssss  1  head
+# sssssssssssssssssssssssssssssssssssss  2
+# sssssssssssssssssssssssssssssssssssss  3
+
+# ddddddddddddddddddddddddddddddddddddd
+# ddddddddddddddddddddddddddddddddddddd  --
+# ddddddddddddddddddddddddddddddddddddd
+# ddddddddddddddddddddddddddddddddddddd
+
 def recogx(csi_raw_datax):
 
+    global incnt
     for aa in range(len(csi_raw_datax)// 2):
-        currsig[aa] = csi_raw_datax[aa*2]
-        #print("raw", currsig)
+        currsig[incnt % CSI_TRAIN_SIZE][aa] = csi_raw_datax[aa*2]
+
+    #print("raw", currsig)
     hit = 'none'; mxx2 = 0xffffffff
     for aa in  traindict.keys():
-        mxx = 0xffffffff; ddd = []
-        for bb in traindict[aa]:
-            #for cc in range(len(currsig)):
-            for cc in range(55):
+        mxx = 0xffffffff
+        # scan dict item
+        for bb in range(len(traindict[aa])):
+            idx = (incnt + bb) % CSI_TRAIN_SIZE
+            #print(idx, end=' ')
+            ddd = []
+            for cc in range(len(currsig[idx])):
                 # Compare
-                ddd.append(SQR(currsig[150+cc] - bb[150+cc]))
+                ddd.append(SQR(currsig[idx][cc] - traindict[aa][bb][cc]))
                 #print ('%.2f#%.2f=%.2f  ' \
                 #        % (currsig[cc],  bb[cc], ddd), end='   ')
             sum = 0
@@ -689,14 +735,15 @@ def recogx(csi_raw_datax):
             #print('%.2f' % sum, end = '  ')
             if mxx > sum:
                 mxx = sum
+        #print()
 
         #print(aa, '%.2f' % mxx, end = '  ')
-        if mxx2 > mxx:
-            mxx2 = mxx
-            hit = aa
-        #if mxx2 > sum:
-        #    mxx2 = sum
+        #if mxx2 > mxx:
+        #    mxx2 = mxx
         #    hit = aa
+        if mxx2 > sum:
+            mxx2 = sum
+            hit = aa
     #print(hit, '%.2f' % mxx2)
 
     logx(strpad(hit, 8), strpad('%.2f' % mxx2, 8), end='  ')
@@ -704,6 +751,8 @@ def recogx(csi_raw_datax):
     dcnt += 1
     if dcnt % 4 == 0:
         logx()
+
+    incnt += 1
 
 def drawtrain(offs, tdata, tdata2):
     ret = len(tdata); scale = 4
