@@ -20,9 +20,11 @@
 #include "esp_now.h"
 
 
-#define CONFIG_LESS_INTERFERENCE_CHANNEL    11
-//#define CONFIG_SEND_FREQUENCY               100
-#define CONFIG_SEND_FREQUENCY               10
+#define CONFIG_LESS_INTERFERENCE_CHANNEL    5
+//define WIFI_SECOND_CHAN_BELOW              3
+
+//#define CONFIG_SEND_FREQUENCY             100
+#define CONFIG_SEND_FREQUENCY               5
 
 static const uint8_t CONFIG_CSI_SEND_MAC[] = {0x1a, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const char *TAG = "csi_send";
@@ -74,7 +76,7 @@ void app_main()
      *        ESP-NOW protocol see: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_now.html
      */
     ESP_ERROR_CHECK(esp_now_init());
-    ESP_ERROR_CHECK(esp_now_set_pmk((uint8_t *)"pmk1234567890123"));
+    //ESP_ERROR_CHECK(esp_now_set_pmk((uint8_t *)"pmk1234567890123"));
 
     esp_now_peer_info_t peer = {
         .channel   = CONFIG_LESS_INTERFERENCE_CHANNEL,
@@ -88,8 +90,10 @@ void app_main()
     ESP_LOGI(TAG, "wifi_channel: %d, send_frequency: %d, mac: " MACSTR,
              CONFIG_LESS_INTERFERENCE_CHANNEL, CONFIG_SEND_FREQUENCY, MAC2STR(CONFIG_CSI_SEND_MAC));
 
+    uint8_t ddd[128] = {0,};
     for (uint8_t count = 0; ;++count) {
-        esp_err_t ret = esp_now_send(peer.peer_addr, &count, sizeof(uint8_t));
+        //esp_err_t ret = esp_now_send(peer.peer_addr, &count, sizeof(uint8_t));
+        esp_err_t ret = esp_now_send(peer.peer_addr, ddd, sizeof(ddd));
 
         if(ret != ESP_OK) {
             ESP_LOGW(TAG, "<%s> ESP-NOW send error", esp_err_to_name(ret));

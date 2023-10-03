@@ -92,7 +92,7 @@ CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
 # csi_vaid_subcarrier_index += [i for i in range(163, 191)]  # 28  White
 
 CSI_DATA_INDEX = 200  # buffer size
-CSI_TRAIN_SIZE = 20
+CSI_TRAIN_SIZE = 5
 #CSI_DATA_COLUMNS = len(csi_vaid_subcarrier_index)
 CSI_DATA_COLUMNS = 300
 DATA_COLUMNS_NAMES = ["type", "id", "mac", "rssi", "rate", "sig_mode", "mcs", "bandwidth", "smoothing", "not_sounding", "aggregation", "stbc", "fec_coding",
@@ -471,7 +471,7 @@ class csi_data_graphical_window(QMainWindow):
 
         self.timer = pq.QtCore.QTimer()
         self.timer.timeout.connect(self.update_data)
-        self.timer.start(100)
+        self.timer.start(200)
 
     def update_data(self):
 
@@ -698,15 +698,15 @@ def fill(csi_raw_datax, outdata, outdata2):
 dcnt = 0
 
 # s=signal d=dictionary
-# sssssssssssssssssssssssssssssssssssss  0
-# sssssssssssssssssssssssssssssssssssss  1  head
-# sssssssssssssssssssssssssssssssssssss  2
-# sssssssssssssssssssssssssssssssssssss  3
+# sssssssssss  0
+# sssssssssss  1  head
+# sssssssssss  2
+# sssssssssss  3
 
-# ddddddddddddddddddddddddddddddddddddd
-# ddddddddddddddddddddddddddddddddddddd  --
-# ddddddddddddddddddddddddddddddddddddd
-# ddddddddddddddddddddddddddddddddddddd
+# ddddddddddd
+# ddddddddddd  --  head
+# ddddddddddd
+# ddddddddddd
 
 def recogx(csi_raw_datax):
 

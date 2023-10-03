@@ -32,7 +32,7 @@
 //#define ESPNOW_WIFI_IF   ESP_IF_WIFI_AP
 #endif
 
-#define CONFIG_LESS_INTERFERENCE_CHANNEL    11
+#define CONFIG_LESS_INTERFERENCE_CHANNEL    5
 #define CONFIG_SEND_FREQUENCY               100
 //#define CONFIG_SEND_FREQUENCY               1
 
@@ -173,7 +173,7 @@ static void wifi_csi_init()
     wifi_csi_config_t csi_config = {
         .lltf_en           = true,
         .htltf_en          = true,
-        .stbc_htltf2_en    = true,
+        //.stbc_htltf2_en    = true,
         .ltf_merge_en      = true,
         .channel_filter_en = true,
         .manu_scale        = false,
@@ -191,7 +191,7 @@ void  send_thread(void *arg)
      *        ESP-NOW protocol see: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_now.html
      */
     ESP_ERROR_CHECK(esp_now_init());
-    ESP_ERROR_CHECK(esp_now_set_pmk((uint8_t *)"pmk1234567890123"));
+    //ESP_ERROR_CHECK(esp_now_set_pmk((uint8_t *)"pmk1234567890123"));
 
     esp_now_peer_info_t peer = {
         .channel   = CONFIG_LESS_INTERFERENCE_CHANNEL,
