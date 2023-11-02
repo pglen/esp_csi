@@ -106,7 +106,7 @@ static void wifi_init(void)
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
     ESP_ERROR_CHECK(esp_wifi_set_channel(CONFIG_LESS_INTERFERENCE_CHANNEL, WIFI_SECOND_CHAN_BELOW));
 
-#ifdef RECV_ESPNOW_CSI 
+#ifdef RECV_ESPNOW_CSI
     ESP_ERROR_CHECK(esp_wifi_set_promiscuous(true));
 #endif
 }
@@ -187,7 +187,7 @@ static int wifi_cmd_radar(int argc, char **argv)
         g_console_input_config.predict_move_threshold    *= 1.1;
         g_console_input_config.train_start               = false;
 
-        printf("RADAR_DADA,0,0,0,%.6f,0,0,%.6f,0\n", 
+        printf("RADAR_DADA,0,0,0,%.6f,0,0,%.6f,0\n",
                 g_console_input_config.predict_someone_threshold,
                 g_console_input_config.predict_move_threshold);
     }
@@ -513,11 +513,11 @@ void app_main(void)
 
 #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
     /**< Fix serial port garbled code due to high baud rate */
-    uart_ll_set_sclk(UART_LL_GET_HW(CONFIG_ESP_CONSOLE_UART_NUM), UART_SCLK_APB);
+    //uart_ll_set_sclk(UART_LL_GET_HW(CONFIG_ESP_CONSOLE_UART_NUM), UART_SCLK_APB);
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-    uart_ll_set_baudrate(UART_LL_GET_HW(CONFIG_ESP_CONSOLE_UART_NUM), CONFIG_ESP_CONSOLE_UART_BAUDRATE, CONFIG_ESP_CONSOLE_UART_BAUDRATE);
+    //uart_ll_set_baudrate(UART_LL_GET_HW(CONFIG_ESP_CONSOLE_UART_NUM), CONFIG_ESP_CONSOLE_UART_BAUDRATE, CONFIG_ESP_CONSOLE_UART_BAUDRATE);
 #else
-    uart_ll_set_baudrate(UART_LL_GET_HW(CONFIG_ESP_CONSOLE_UART_NUM), CONFIG_ESP_CONSOLE_UART_BAUDRATE);
+    //uart_ll_set_baudrate(UART_LL_GET_HW(CONFIG_ESP_CONSOLE_UART_NUM), CONFIG_ESP_CONSOLE_UART_BAUDRATE);
 #endif
 #endif
 

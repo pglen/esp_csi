@@ -24,7 +24,7 @@
 //define WIFI_SECOND_CHAN_BELOW              3
 
 //#define CONFIG_SEND_FREQUENCY             100
-#define CONFIG_SEND_FREQUENCY               5
+#define CONFIG_SEND_FREQUENCY               20
 
 static const uint8_t CONFIG_CSI_SEND_MAC[] = {0x1a, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const char *TAG = "csi_send";
